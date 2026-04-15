@@ -5,5 +5,5 @@ type IncomeDisplayProps = {
 }
 
 export function IncomeDisplay({ income }: IncomeDisplayProps) {
-  return <p>Income: ${formatNumber(income)}</p>
+  return <p>Income: ${formatNumber(income)}/s</p>
 }

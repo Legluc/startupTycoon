@@ -257,7 +257,7 @@ h1 {
 .counter {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  gap: 2rem;
   margin: 1.5rem 0;
   padding: 1rem;
   border: 1px solid var(--border);
@@ -269,6 +269,17 @@ h1 {
   margin: 0;
   font-weight: 600;
   color: var(--text);
+}
+
+.gameboard {
+  display: flex;
+  align-items: self-start;
+  justify-content: space-between;
+}
+
+.debug-buttons {
+  display: flex;
+  gap: 1rem;
 }
 
 @media (max-width: 768px) {
