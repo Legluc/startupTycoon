@@ -254,6 +254,33 @@ h1 {
   background: var(--primary);
   color: #fff;
 }
+.counter {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2rem;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+}
+
+.counter p {
+  margin: 0;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.gameboard {
+  display: flex;
+  align-items: self-start;
+  justify-content: space-between;
+}
+
+.debug-buttons {
+  display: flex;
+  gap: 1rem;
+}
 
 @media (max-width: 768px) {
   .app-shell {
@@ -272,6 +299,10 @@ h1 {
   }
 
   .stats-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .counter {
     grid-template-columns: 1fr;
   }
 }
