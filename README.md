@@ -76,3 +76,13 @@ le router est configuré dans le App.tsx
 ## Quel élément HTML sert de point d’ancrage (id) ?
 
 c'est une div d'id root dans index.html
+
+## role des composants
+
+- ClickButton est un bouton qui augmentera le moneyDisplay au click en fonction du clickValue.
+- MoneyDisplay est un composant d'affichage du total de money qui a en props la money de base.
+- IncomeDisplay est un composant d'affichage du total d'income qui a en props l'income de base.
+
+## role des utils
+
+- formatNumbers est une fonction de formatage des nombres qui format les milliers et millions.
