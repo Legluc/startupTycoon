@@ -1,23 +1,13 @@
-import { useState, useEffect } from 'react'
-import { MoneyDisplay } from '@/components/MoneyDisplay'
-import { IncomeDisplay } from '@/components/IncomeDisplay'
-import { ClickButton } from '@/components/ClickButton'
+import { useEffect } from 'react'
+import { ClickButton } from '../components/ClickButton'
+import { useGame } from '../lib/GameContext'
 
 export function HomePage() {
-  const [money, setMoney] = useState(0)
+  const { money, setMoney, incomePerSecond } = useGame()
   const clickValue = 1
-  const [incomePerSecond, setIncomePerSecond] = useState(0)
 
   const handleClick = () => {
     setMoney(money + clickValue)
-  }
-
-  const handleIncreaseIncome = () => {
-    setIncomePerSecond((prev) => prev + 1)
-  }
-
-  const handleResetIncome = () => {
-    setIncomePerSecond(0)
   }
 
   useEffect(() => {
@@ -34,20 +24,8 @@ export function HomePage() {
     <section className="hero">
       <div className="gameboard">
         <h1>Startup Tycoon</h1>
-        <div className="counter">
-          <IncomeDisplay income={incomePerSecond} />
-          <MoneyDisplay money={money} />
-        </div>
       </div>
       <ClickButton clickValue={clickValue} onClick={handleClick} />
-      <div className="debug-buttons">
-        <button onClick={handleIncreaseIncome} className="secondary-btn">
-          +1 income/sec
-        </button>
-        <button onClick={handleResetIncome} className="secondary-btn">
-          Reset income/sec
-        </button>
-      </div>
     </section>
   )
 }

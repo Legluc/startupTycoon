@@ -47,8 +47,7 @@ Le workflow GitHub Actions execute automatiquement:
 
 1. lint
 2. typecheck
-3. tests
-4. build
+3. build
 
 Fichier: .github/workflows/ci.yml
 
@@ -114,3 +113,29 @@ Le callback du timer est planifié dans la macrotask queue.
 ## Pourquoi le timer peut-il être retardé si le thread principal est occupé ?
 
 Le callback qui est dans la macrostack queue ne peut pas être éxécuté tant que la call stack n'est pas vide ce qui peut retardé le timer
+
+## Où vivent money et incomePerSecond ?
+
+Dans le composant AppLayout via useState. AppLayout est le parent de toutes les pages, donc c'est là qu'on centralise l'état du jeu.
+
+## Shop et Game ont-ils besoin des mêmes données ?
+
+Oui. Game les utilise pour :
+
+- Afficher l'argent et le revenu/sec
+- Générer de l'argent via le tick
+- Augmenter l'argent au clic
+
+Shop les utilise pour :
+
+- Vérifier si on peut se permettre un upgrade
+- Déduire le coût à l'achat
+- Augmenter incomePerSecond
+
+## Comment avez-vous fait pour partager ces données sans store global ?
+
+Via React Context (GameContext). AppLayout possède l'état et le fournit à Game et Shop via le hook useGame().
+
+## Qu'est-ce qui devient fragile dans votre solution actuelle ?
+
+Le fait de ne pas avoir de persistence les données se réinitialisent au reload, les états locaux dans les pages Shop a son propre upgrades state, décalé avec AppLayout. Pas de sauvegarde possible donc le jeu ne peut pas continué après fermeture du navigateur.
