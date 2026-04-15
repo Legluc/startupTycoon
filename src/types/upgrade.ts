@@ -3,6 +3,7 @@ export type Upgrade = {
   name: string
   baseCost: number
   incomePerSecondGain: number
+  clickValueGain: number
   count: number
   description: string
 }

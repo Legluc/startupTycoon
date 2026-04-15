@@ -1,40 +1,27 @@
-import { useState } from 'react'
-import { UPGRADES } from '../data/upgrades'
 import { UpgradeCard } from '../components/UpgradeCard'
 import { useGame } from '../lib/GameContext'
 import { calculateUpgradeCost } from '../utils/calculateUpgradeCost'
 
 export function Shop() {
-  const { money, setMoney, incomePerSecond, setIncomePerSecond } = useGame()
-  const [upgrades, setUpgrades] = useState(UPGRADES)
+  const { state, dispatch } = useGame()
 
   const handleBuy = (id: string) => {
-    const upgrade = upgrades.find((u) => u.id === id)
-    if (!upgrade) return
-
-    const currentCost = calculateUpgradeCost(upgrade.baseCost, upgrade.count)
-
-    if (money < currentCost) {
-      return
-    }
-
-    setMoney(money - currentCost)
-    setIncomePerSecond(incomePerSecond + upgrade.incomePerSecondGain)
-
-    setUpgrades(
-      upgrades.map((u) => (u.id === id ? { ...u, count: u.count + 1 } : u))
-    )
+    dispatch({ type: 'BUY_UPGRADE', payload: id })
   }
 
   return (
-    <section className="hero">
-      <h1>Boutique</h1>
-      <p className="subtitle">
-        Achetez des upgrades pour augmenter vos revenus
-      </p>
+    <section className="hero shop-page">
+      <header className="shop-header">
+        <p className="eyebrow">Boutique</p>
+        <h1>Investis pour scaler plus vite</h1>
+        <p className="subtitle">
+          Achète des upgrades de revenu passif et de clic pour accélérer ta
+          croissance.
+        </p>
+      </header>
 
       <div className="upgrades-grid">
-        {upgrades.map((upgrade) => {
+        {state.upgrades.map((upgrade) => {
           const currentCost = calculateUpgradeCost(
             upgrade.baseCost,
             upgrade.count
@@ -44,7 +31,7 @@ export function Shop() {
               key={upgrade.id}
               upgrade={upgrade}
               currentCost={currentCost}
-              canAfford={money >= currentCost}
+              canAfford={state.money >= currentCost}
               onBuy={() => handleBuy(upgrade.id)}
             />
           )

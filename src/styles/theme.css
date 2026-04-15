@@ -282,6 +282,90 @@ h1 {
   gap: 1rem;
 }
 
+.shop-page {
+  gap: 1.2rem;
+}
+
+.shop-header {
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 1.1rem 1rem;
+  background:
+    radial-gradient(circle at 85% 15%, rgba(20, 99, 86, 0.14), transparent 35%),
+    radial-gradient(
+      circle at 10% 90%,
+      rgba(255, 153, 51, 0.14),
+      transparent 35%
+    ),
+    #fff;
+}
+
+.upgrades-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+  align-items: start;
+}
+
+.upgrade-card {
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: #fff;
+  padding: 1rem;
+  box-shadow: 0 8px 20px rgba(31, 26, 22, 0.08);
+  display: grid;
+  gap: 0.65rem;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    border-color 140ms ease;
+}
+
+.upgrade-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 26px rgba(31, 26, 22, 0.12);
+  border-color: #c8baa4;
+}
+
+.upgrade-card h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  line-height: 1.2;
+}
+
+.upgrade-card .description {
+  margin: 0;
+  color: var(--text-muted);
+  min-height: 2.4rem;
+}
+
+.upgrade-stats {
+  display: grid;
+  gap: 0.35rem;
+  padding: 0.65rem 0.7rem;
+  border-radius: 10px;
+  background: #fffcf7;
+  border: 1px solid #efe6d9;
+}
+
+.upgrade-stats p {
+  margin: 0;
+}
+
+.upgrade-card .secondary-btn {
+  width: 100%;
+  margin-top: 0.25rem;
+}
+
+.upgrade-card.disabled {
+  opacity: 0.72;
+}
+
+.upgrade-card.disabled .secondary-btn {
+  cursor: not-allowed;
+}
+
 @media (max-width: 768px) {
   .app-shell {
     width: calc(100% - 1rem);
@@ -303,6 +387,10 @@ h1 {
   }
 
   .counter {
+    grid-template-columns: 1fr;
+  }
+
+  .upgrades-grid {
     grid-template-columns: 1fr;
   }
 }

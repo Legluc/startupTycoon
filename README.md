@@ -139,3 +139,33 @@ Via React Context (GameContext). AppLayout possède l'état et le fournit à Gam
 ## Qu'est-ce qui devient fragile dans votre solution actuelle ?
 
 Le fait de ne pas avoir de persistence les données se réinitialisent au reload, les états locaux dans les pages Shop a son propre upgrades state, décalé avec AppLayout. Pas de sauvegarde possible donc le jeu ne peut pas continué après fermeture du navigateur.
+
+## Schéma du flux
+
+```
+           (interaction utilisateur)
+         clic / achat / tick
+               │
+               ▼
+      View (Game, Shop, GameCounter)
+               │
+               │ dispatch(action)
+               ▼
+      Store (GameContext + useReducer)
+               │
+               │ action
+               ▼
+            gameReducer(state, action)
+               │
+               │ retourne un NOUVEL état
+               ▼
+              new GameState
+   (money, clickValue, incomePerSecond, upgrades, stats)
+               │
+               │ propagation via Context
+               ▼
+      View (Game, Shop, GameCounter)
+               │
+               ▼
+            render(View)
+```

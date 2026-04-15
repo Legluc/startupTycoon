@@ -1,33 +1,12 @@
-import { useState } from 'react'
 import { Link, NavLink, Outlet } from 'react-router-dom'
 import { GameProvider } from '../lib/GameContext'
 import { GameCounter } from './GameCounter'
 
 export function AppLayout() {
   const currentYear = new Date().getFullYear()
-  const [money, setMoneyState] = useState(0)
-  const [incomePerSecond, setIncomePerSecondState] = useState(0)
-
-  const setMoney = (value: number | ((prev: number) => number)) => {
-    if (typeof value === 'function') {
-      setMoneyState(value)
-    } else {
-      setMoneyState(value)
-    }
-  }
-
-  const setIncomePerSecond = (value: number | ((prev: number) => number)) => {
-    if (typeof value === 'function') {
-      setIncomePerSecondState(value)
-    } else {
-      setIncomePerSecondState(value)
-    }
-  }
 
   return (
-    <GameProvider
-      value={{ money, setMoney, incomePerSecond, setIncomePerSecond }}
-    >
+    <GameProvider>
       <div className="app-shell">
         <header className="site-header">
           <Link to="/" className="brand">
@@ -62,7 +41,7 @@ export function AppLayout() {
           </nav>
         </header>
 
-        <GameCounter money={money} incomePerSecond={incomePerSecond} />
+        <GameCounter />
 
         <main>
           <Outlet />

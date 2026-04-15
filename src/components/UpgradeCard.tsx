@@ -1,6 +1,5 @@
 import type { Upgrade } from '../types/upgrade'
 import { formatNumber } from '../utils/formatNumbers'
-import { calculateUpgradeCost } from '../utils/calculateUpgradeCost'
 
 type UpgradeCardProps = {
   upgrade: Upgrade
@@ -15,6 +14,9 @@ export function UpgradeCard({
   currentCost,
   onBuy,
 }: UpgradeCardProps) {
+  const hasIncomeBonus = upgrade.incomePerSecondGain > 0
+  const hasClickBonus = upgrade.clickValueGain > 0
+
   return (
     <div className={`upgrade-card ${!canAfford ? 'disabled' : ''}`}>
       <h3>{upgrade.name}</h3>
@@ -26,7 +28,11 @@ export function UpgradeCard({
         <p>
           Coût: <strong>${formatNumber(currentCost)}</strong>
         </p>
-        <p>+${formatNumber(upgrade.incomePerSecondGain)}/sec</p>
+        {hasIncomeBonus && (
+          <p>+${formatNumber(upgrade.incomePerSecondGain)}/sec</p>
+        )}
+        {hasClickBonus && <p>+${formatNumber(upgrade.clickValueGain)}/clic</p>}
+        {!hasIncomeBonus && !hasClickBonus && <p>Aucun bonus</p>}
       </div>
       <button onClick={onBuy} disabled={!canAfford} className="secondary-btn">
         {canAfford ? 'Acheter' : 'Trop cher'}
