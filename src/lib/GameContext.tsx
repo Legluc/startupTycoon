@@ -10,6 +10,7 @@ import { useAutoSave } from '../hooks/useAutoSave'
 export type GameContextType = {
   state: GameState
   dispatch: (action: GameAction) => void
+  lastSavedAt: number | null
 }
 
 const GameContext = createContext<GameContextType | undefined>(undefined)
@@ -27,15 +28,12 @@ type GameProviderProps = {
 }
 
 export function GameProvider({ children }: GameProviderProps) {
-  // Initialiser l'état : charger depuis localStorage ou utiliser INITIAL_STATE
   const getInitialState = (): GameState => {
     const saved = loadGameState()
     if (saved) {
-      console.log('✅ Game state restored from localStorage')
       return saved
     }
 
-    console.log('📝 Starting with fresh game state')
     return {
       ...INITIAL_STATE,
       upgrades: UPGRADES.map((u) => ({ ...u, count: 0 })),
@@ -43,22 +41,15 @@ export function GameProvider({ children }: GameProviderProps) {
   }
 
   const [state, dispatch] = useReducer(gameReducer, undefined, getInitialState)
-  const throttledSave = useAutoSave(state)
+  const { saveImmediate, lastSavedAt } = useAutoSave(state)
 
-  // Wrapper autour de dispatch pour intercepter les actions
   const enhancedDispatch = (action: GameAction) => {
     dispatch(action)
 
-    // Sauvegarder immédiatement pour les actions importantes
     if (action.type === 'BUY_UPGRADE' || action.type === 'RESET_GAME') {
-      setTimeout(() => throttledSave({ immediate: true }), 0)
+      saveImmediate()
     }
   }
-
-  // Throttle la sauvegarde
-  useEffect(() => {
-    throttledSave()
-  }, [state, throttledSave])
 
   useEffect(() => {
     if (state.incomePerSecond === 0) return
@@ -71,7 +62,9 @@ export function GameProvider({ children }: GameProviderProps) {
   }, [state.incomePerSecond])
 
   return (
-    <GameContext.Provider value={{ state, dispatch: enhancedDispatch }}>
+    <GameContext.Provider
+      value={{ state, dispatch: enhancedDispatch, lastSavedAt }}
+    >
       {children}
     </GameContext.Provider>
   )

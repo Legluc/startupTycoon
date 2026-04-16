@@ -1,12 +1,14 @@
+import { useCallback } from 'react'
 import { ClickButton } from '../components/ClickButton'
 import { useGame } from '../lib/GameContext'
 
 export function HomePage() {
   const { state, dispatch } = useGame()
 
-  const handleClick = () => {
+  // Memoize le handler du clic
+  const handleClick = useCallback(() => {
     dispatch({ type: 'CLICK' })
-  }
+  }, [dispatch])
 
   return (
     <section className="hero hero-game">

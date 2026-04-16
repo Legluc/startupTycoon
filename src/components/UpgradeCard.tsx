@@ -1,3 +1,4 @@
+import { memo, useCallback, useMemo } from 'react'
 import type { Upgrade } from '../types/upgrade'
 import { formatNumber } from '../utils/formatNumbers'
 
@@ -5,57 +6,83 @@ type UpgradeCardProps = {
   upgrade: Upgrade
   canAfford: boolean
   currentCost: number
-  onBuy: () => void
+  onBuy: (id: string) => void
 }
 
-export function UpgradeCard({
-  upgrade,
-  canAfford,
-  currentCost,
-  onBuy,
-}: UpgradeCardProps) {
-  const hasIncomeBonus = upgrade.incomePerSecondGain > 0
-  const hasClickBonus = upgrade.clickValueGain > 0
+export const UpgradeCard = memo(
+  function UpgradeCard({
+    upgrade,
+    canAfford,
+    currentCost,
+    onBuy,
+  }: UpgradeCardProps) {
+    const hasIncomeBonus = upgrade.incomePerSecondGain > 0
+    const hasClickBonus = upgrade.clickValueGain > 0
 
-  // Ratio coût / bonus
-  const incomeEfficiency = hasIncomeBonus
-    ? currentCost / upgrade.incomePerSecondGain
-    : null
+    // Memoize les calculs d'efficiency
+    const efficiencies = useMemo(
+      () => ({
+        income: hasIncomeBonus
+          ? currentCost / upgrade.incomePerSecondGain
+          : null,
+        click: hasClickBonus ? currentCost / upgrade.clickValueGain : null,
+      }),
+      [
+        currentCost,
+        upgrade.incomePerSecondGain,
+        upgrade.clickValueGain,
+        hasIncomeBonus,
+        hasClickBonus,
+      ]
+    )
 
-  const clickEfficiency = hasClickBonus
-    ? currentCost / upgrade.clickValueGain
-    : null
+    const handleClick = useCallback(() => {
+      onBuy(upgrade.id)
+    }, [onBuy, upgrade.id])
 
-  return (
-    <div className={`upgrade-card ${!canAfford ? 'disabled' : ''}`}>
-      <h3>{upgrade.name}</h3>
-      <p className="description">{upgrade.description}</p>
-      <div className="upgrade-stats">
-        <p>
-          Possédés: <strong>{upgrade.count}</strong>
-        </p>
-        <p>
-          Coût: <strong>${formatNumber(currentCost)}</strong>
-        </p>
-        {hasIncomeBonus && (
+    return (
+      <div className={`upgrade-card ${!canAfford ? 'disabled' : ''}`}>
+        <h3>{upgrade.name}</h3>
+        <p className="description">{upgrade.description}</p>
+        <div className="upgrade-stats">
           <p>
-            +${formatNumber(upgrade.incomePerSecondGain)}/sec
-            <br />
-            <small>({formatNumber(incomeEfficiency)}/sec)</small>
+            Possédés: <strong>{upgrade.count}</strong>
           </p>
-        )}
-        {hasClickBonus && (
           <p>
-            +${formatNumber(upgrade.clickValueGain)}/clic
-            <br />
-            <small>({formatNumber(clickEfficiency)}/clic)</small>
+            Coût: <strong>${formatNumber(currentCost)}</strong>
           </p>
-        )}
-        {!hasIncomeBonus && !hasClickBonus && <p>Aucun bonus</p>}
+          {hasIncomeBonus && efficiencies.income && (
+            <p>
+              +${formatNumber(upgrade.incomePerSecondGain)}/sec
+              <br />
+              <small>({formatNumber(efficiencies.income)}/sec)</small>
+            </p>
+          )}
+          {hasClickBonus && efficiencies.click && (
+            <p>
+              +${formatNumber(upgrade.clickValueGain)}/clic
+              <br />
+              <small>({formatNumber(efficiencies.click)}/clic)</small>
+            </p>
+          )}
+          {!hasIncomeBonus && !hasClickBonus && <p>Aucun bonus</p>}
+        </div>
+        <button
+          onClick={handleClick}
+          disabled={!canAfford}
+          className="secondary-btn"
+        >
+          {canAfford ? 'Acheter' : 'Trop cher'}
+        </button>
       </div>
-      <button onClick={onBuy} disabled={!canAfford} className="secondary-btn">
-        {canAfford ? 'Acheter' : 'Trop cher'}
-      </button>
-    </div>
-  )
-}
+    )
+  },
+  (prevProps, nextProps) => {
+    return (
+      prevProps.upgrade.id === nextProps.upgrade.id &&
+      prevProps.upgrade.count === nextProps.upgrade.count &&
+      prevProps.currentCost === nextProps.currentCost &&
+      prevProps.canAfford === nextProps.canAfford
+    )
+  }
+)

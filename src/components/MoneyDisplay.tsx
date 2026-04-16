@@ -1,9 +1,12 @@
-import { formatNumber } from '@/utils/formatNumbers'
+import { memo } from 'react'
+import { formatNumber } from '../utils/formatNumbers'
 
 type MoneyDisplayProps = {
   money: number
 }
 
-export function MoneyDisplay({ money }: MoneyDisplayProps) {
+export const MoneyDisplay = memo(function MoneyDisplay({
+  money,
+}: MoneyDisplayProps) {
   return <p>Money: ${formatNumber(money)}</p>
-}
+})

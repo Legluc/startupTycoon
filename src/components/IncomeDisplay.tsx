@@ -1,9 +1,12 @@
-import { formatNumber } from '@/utils/formatNumbers'
+import { memo } from 'react'
+import { formatNumber } from '../utils/formatNumbers'
 
 type IncomeDisplayProps = {
   income: number
 }
 
-export function IncomeDisplay({ income }: IncomeDisplayProps) {
+export const IncomeDisplay = memo(function IncomeDisplay({
+  income,
+}: IncomeDisplayProps) {
   return <p>Income: ${formatNumber(income)}/s</p>
-}
+})

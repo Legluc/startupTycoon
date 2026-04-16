@@ -1,64 +1,145 @@
 # Startup Tycoon
 
-Projet front-only en React + TypeScript + Vite.
+Jeu inactif / clicker minimaliste construit avec React + TypeScript + Vite.
+Gestion d'état globale via Context API, persistance localStorage, et optimisations de rendu.
 
-## Stack
+## 🎮 Caractéristiques
 
-- React 19
-- React Router
-- Vite 8
-- TypeScript
-- ESLint + Prettier
+- **Jeu inactif** : cliquez pour gagner de l'argent, achetez des upgrades pour générer des revenus automatiques
+- **Persistance** : sauvegarde automatique toutes les 5 secondes + restauration au rechargement
+- **Optimisé** : React.memo, useMemo, lazy loading, debounce pour éviter les re-renders inutiles
+- **TypeScript** : typage strict pour plus de robustesse
+- **Progressive** : chargement différé des pages lourdes (Shop, Stats)
 
-## Lancer le projet
+## 📚 Stack Technique
 
-1. Installer les dependances:
-   npm install
-2. Demarrer le serveur de dev:
-   npm run dev
-3. Ouvrir l'URL affichee dans le terminal.
+- **React 19** : framework UI moderne avec hooks
+- **React Router** : navigation SPA
+- **TypeScript** : typage statique
+- **Vite 8** : bundler ultra-rapide
+- **ESLint + Prettier** : qualité de code
+- **localStorage** : persistance sans backend
 
-## Scripts utiles
+## 🚀 Démarrage Rapide
 
-- npm run dev: lancement en local.
-- npm run lint: verification ESLint.
-- npm run typecheck: verification TypeScript.
-- npm run build: build de production.
-- npm run preview: previsualisation du build.
-- npm run format: formatage Prettier.
+### Installation et développement
 
-## Variables d'environnement
+```bash
+# Installer les dépendances
+npm install
 
-Copier .env.example vers un .env local puis ajuster les valeurs:
+# Démarrer le serveur de développement
+npm run dev
 
-- VITE_APP_NAME: nom de l'application.
+# Ouvrir l'URL affichée dans le terminal (ex: http://localhost:5173)
+```
 
-## Structure principale
+### Scripts utiles
 
-- src/pages: ecrans de l'application (jeu, boutique, stats, parametres, 404).
-- src/state: gestion d'etat globale.
-- src/services: acces au stockage local.
-- src/components: composants reutilisables.
-- src/styles: gèrele styles global.
+```bash
+npm run dev          # Serveur local avec rechargement automatique
+npm run lint         # Vérification ESLint
+npm run typecheck    # Vérification TypeScript
+npm run build        # Build de production
+npm run preview      # Prévisualisation du build
+npm run format       # Formatage Prettier
+npm run lighthouse   # Audit de performance (si installé)
+```
 
-## Qualite et CI
+## 🔐 Configuration
 
-Le workflow GitHub Actions execute automatiquement:
+### Variables d'environnement
 
-1. lint
-2. typecheck
-3. build
+Copier `.env.example` vers `.env.local` et ajuster les valeurs :
 
-Fichier: .github/workflows/ci.yml
+```bash
+VITE_APP_NAME=Startup Tycoon
+```
 
-## Deploiement statique
+## 📁 Structure du Projet
 
-Le projet produit des assets statiques dans dist/.
-Tu peux deployer sur Vercel, Netlify ou GitHub Pages.
+```
+src/
+├── App.tsx                      # Configuration des routes
+├── main.tsx                     # Point d'entrée
+├── components/                  # Composants réutilisables
+│   ├── AppLayout.tsx           # Layout principal (header, footer, outlet)
+│   ├── AppHeader.tsx           # Navigation principale (mémorisé)
+│   ├── AppFooter.tsx           # Footer (mémorisé)
+│   ├── GameCounter.tsx         # Affichage money/income (mémorisé + useMemo)
+│   ├── ClickButton.tsx         # Bouton principal (mémorisé)
+│   ├── UpgradeCard.tsx         # Carte d'upgrade (mémorisé + custom comparator)
+│   ├── SaveTimeDisplay.tsx     # Affichage date dernière sauvegarde
+│   ├── MoneyDisplay.tsx        # Affichage argent (mémorisé)
+│   ├── IncomeDisplay.tsx       # Affichage revenu/sec (mémorisé)
+│   └── StatCard.tsx            # Carte statistique
+├── pages/                       # Pages de l'application
+│   ├── Game.tsx                # Page principale (clicker)
+│   ├── Shop.tsx                # Boutique (lazy loaded)
+│   ├── Stats.tsx               # Statistiques (lazy loaded)
+│   ├── Settings.tsx            # Paramètres + gestion sauvegardes
+│   └── NotFoundPage.tsx        # Page 404
+├── lib/                         # Logique et contexte
+│   ├── GameContext.tsx         # Context + Provider (état global)
+│   ├── gameReducer.ts          # Reducer pour les actions
+├── hooks/                       # Hooks personnalisés
+│   ├── useAutoSave.ts          # Sauvegarde automatique (5s)
+│   └── useDebounce.ts          # Debounce (recherche)
+├── services/                    # Services métier
+│   └── storage.ts              # Persistance localStorage (sauvegarde/chargement)
+├── types/                       # Définitions TypeScript
+│   ├── gameState.ts            # Types du state global
+│   └── upgrade.ts              # Type Upgrade
+├── data/                        # Données statiques
+│   └── upgrades.ts             # Catalogue des upgrades
+├── utils/                       # Fonctions utilitaires
+│   ├── formatNumbers.ts        # Formatage (ex: 1000 → 1K)
+│   └── calculateUpgradeCost.ts # Calcul coûts upgrades
+├── styles/                      # CSS global
+│   ├── theme.css               # Variables + styles globaux
+│   ├── game-counter.css        # Styles compteur
+│   ├── settings.css            # Styles settings
+│   └── stats.css               # Styles stats
+└── index.html                   # Point d'ancrage DOM (#root)
+```
 
-Commande de build:
+### Rôles des composants principaux
 
+| Composant          | Rôle                              | Optimisation                       |
+| ------------------ | --------------------------------- | ---------------------------------- |
+| `GameCounter`      | Affiche money et income/sec       | React.memo + useMemo displayValues |
+| `ClickButton`      | Bouton principal (augmente money) | React.memo                         |
+| `UpgradeCard`      | Carte achetable (boutique)        | React.memo + custom comparator     |
+| `AppHeader/Footer` | Navigation et footer              | React.memo (ne changent jamais)    |
+| `SaveTimeDisplay`  | Affichage date sauvegarde         | React.memo + ticker interne        |
+
+### Rôles des utilities
+
+| Utilitaire               | Fonction                                             |
+| ------------------------ | ---------------------------------------------------- |
+| `formatNumbers()`        | Formate 1000 → "1K", 1000000 → "1M"                  |
+| `calculateUpgradeCost()` | Calcule le coût d'un upgrade (formule exponentielle) |
+| `useAutoSave()`          | Sauvegarde automatique toutes les 5 secondes         |
+| `useDebounce()`          | Debounce pour la recherche (300ms)                   |
+
+## ✅ Qualité et CI
+
+Le workflow GitHub Actions exécute automatiquement :
+
+1. **lint** : vérification ESLint (code styles)
+2. **typecheck** : vérification TypeScript (typage)
+3. **build** : build de production (détecte les erreurs)
+
+Fichier : `.github/workflows/ci.yml`
+
+Commande de build :
+
+```bash
 npm run build
+npm run preview
+```
+
+---
 
 ## Dans quel fichier l’application est-elle “montée” dans le DOM ?
 
@@ -193,3 +274,35 @@ totalClicks: part de la progression
 totalEarned: part de la progression
 
 C'est l'état complet du jeu. C'est le joueur qui l'a construit par ses actions. Si on perd ça le joueur perd tout son progrès.
+
+## Qu'est-ce qui re-renderait "inutilement" avant optimisation ?
+
+Le problème central : le TICK déclenche une réaction en chaîne de re-renders inutiles
+
+- Chaque TICK déclenche un nouvel état dans GameContext
+- GameContext change tous les composants abonnés re-rendrent
+- Shop re-render tous les UpgradeCard re-rendrent même si leurs props n'ont pas changé
+- GameCounter re-render recalcule formatNumber() 2 fois même si money/income n'ont pas changé
+- ClickButton re-render recalcule formatNumber() même si clickValue n'a pas changé
+- AppHeader et AppFooter re-render sans aucune raison
+- Settings re-render toutes les secondes à cause du setState du useEffect
+
+## Quelles optimisations ont eu un impact réel ?
+
+Les 3 des optimisations avec un impact verifiable :
+React.memo sur UpgradeCard + useMemo upgradesWithCosts avec 5 re-renders/TICK contre 0 re-renders/TICK si la props reste inchangées.
+React.memo sur GameCounter + useMemo displayValues avec 1 re-renders/TICK contre 0 re-renders/TICK sauf si money/income changent réellement.
+Lazy loading Shop + Stats qui lors du démarage de l'app divise casiment part 2 la charge.
+
+## Quelle optimisation vous semble la plus rentable ?
+
+React.memo sur UpgradeCard avec useMemo sur upgradesWithCosts car avec peut d'implémentation suplémentaire on élimine les re-render inutile ensuite le lazy load mais moins rentable car utile au chargement maus sur une app si petite c'est pas le plus rentable.
+
+## Pourquoi le TICK est un bon révélateur de problèmes de perf ?
+
+Le TICK est un bon révélateur de problèmes de perf car il est régulier et reproductible, pas d'aléatoire donc pour le controle c'est parfait. Il amplifie les problèmes, si un re-render inutile s'accumule toutes les 1s celà devient rapidement coûteux. Permet la mesure quantitative avec des console.log qui sont facilement identifiable.
+
+## Quelles optimisations vous n'avez PAS faites, et pourquoi ?
+
+La virtualisation des listes (windowing) pour les upgrades aurais pu etre faite mais au vue du petit nombre d'upgrade et du fait qu'elle ne soit pas re-render hormis dnas le cas ou elle devient achetable et ou elle est acheté ce n'est pas pertinent en rapport de gain / effort.
+L'utilisation de Web worker pour faire du multi-thread mais il n'y a pas de calcul complexe à réalisé ici donc peut d'intéret ici aussi.
