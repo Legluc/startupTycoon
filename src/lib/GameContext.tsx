@@ -4,6 +4,8 @@ import type { GameState, GameAction } from '../types/gameState'
 import { gameReducer } from './gameReducer'
 import { INITIAL_STATE } from '../types/gameState'
 import { UPGRADES } from '../data/upgrades'
+import { loadGameState } from '../services/storage'
+import { useAutoSave } from '../hooks/useAutoSave'
 
 export type GameContextType = {
   state: GameState
@@ -12,7 +14,6 @@ export type GameContextType = {
 
 const GameContext = createContext<GameContextType | undefined>(undefined)
 
-// eslint-disable-next-line react-refresh/only-export-components
 export function useGame() {
   const context = useContext(GameContext)
   if (!context) {
@@ -26,12 +27,38 @@ type GameProviderProps = {
 }
 
 export function GameProvider({ children }: GameProviderProps) {
-  const initialState: GameState = {
-    ...INITIAL_STATE,
-    upgrades: UPGRADES.map((u) => ({ ...u, count: 0 })),
+  // Initialiser l'état : charger depuis localStorage ou utiliser INITIAL_STATE
+  const getInitialState = (): GameState => {
+    const saved = loadGameState()
+    if (saved) {
+      console.log('✅ Game state restored from localStorage')
+      return saved
+    }
+
+    console.log('📝 Starting with fresh game state')
+    return {
+      ...INITIAL_STATE,
+      upgrades: UPGRADES.map((u) => ({ ...u, count: 0 })),
+    }
   }
 
-  const [state, dispatch] = useReducer(gameReducer, initialState)
+  const [state, dispatch] = useReducer(gameReducer, undefined, getInitialState)
+  const throttledSave = useAutoSave(state)
+
+  // Wrapper autour de dispatch pour intercepter les actions
+  const enhancedDispatch = (action: GameAction) => {
+    dispatch(action)
+
+    // Sauvegarder immédiatement pour les actions importantes
+    if (action.type === 'BUY_UPGRADE' || action.type === 'RESET_GAME') {
+      setTimeout(() => throttledSave({ immediate: true }), 0)
+    }
+  }
+
+  // Throttle la sauvegarde
+  useEffect(() => {
+    throttledSave()
+  }, [state, throttledSave])
 
   useEffect(() => {
     if (state.incomePerSecond === 0) return
@@ -41,10 +68,10 @@ export function GameProvider({ children }: GameProviderProps) {
     }, 1000)
 
     return () => clearInterval(interval)
-  }, [state.incomePerSecond, dispatch])
+  }, [state.incomePerSecond])
 
   return (
-    <GameContext.Provider value={{ state, dispatch }}>
+    <GameContext.Provider value={{ state, dispatch: enhancedDispatch }}>
       {children}
     </GameContext.Provider>
   )

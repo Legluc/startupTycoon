@@ -12,5 +12,5 @@ export function formatNumber(num: number): string {
       'K'
     )
   }
-  return num.toString()
+  return num.toFixed(1).toString()
 }

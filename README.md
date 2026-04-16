@@ -143,7 +143,7 @@ Le fait de ne pas avoir de persistence les données se réinitialisent au reload
 ## Schéma du flux
 
 ```
-           (interaction utilisateur)
+      (interaction utilisateur)
          clic / achat / tick
                │
                ▼
@@ -169,3 +169,27 @@ Le fait de ne pas avoir de persistence les données se réinitialisent au reload
                ▼
             render(View)
 ```
+
+## Pourquoi ne pas sauvegarder à chaque tick sans throttle ?
+
+Cela impacterais trop les performances les tick s'exécute toutes les 1 seconde, chaque TICK dispatch une action donc un nouvel état. Sans throttle = 1 sauvegarde localStorage par seconde, le localStorage étant synchrone il bloque le thread principal ce qui produit le ralentissement du jeu et des battements d'écran.
+
+## Que se passe-t-il si le JSON est corrompu ?
+
+J'ai fait une gestion d'erreur avec un try catch afin de vérifé si le JSON est corrompu ou incomplet. Si c'est le cas on renvoie simplement une nouvelle partie plutot que de crash.
+
+## À quoi sert version dans la sauvegarde ?
+
+La version sert en cas d'update du state si on rajoute, change ou supprime des données, dans ce cas on chargera une nouvelle partie plutot que de crash.
+
+## Quelles données avez-vous choisi de sauvegarder, et pourquoi ?
+
+j'ai choisie de sauvegardé les données suivante :
+money: Le joueur a gagné cet argent, il faut le sauver
+clickValue: Résultat d'achats (peut influencer futur earning)
+incomePerSecond: Résultat d'achats (progression du joueur)
+upgrades: Upgrades achetés = progression
+totalClicks: part de la progression
+totalEarned: part de la progression
+
+C'est l'état complet du jeu. C'est le joueur qui l'a construit par ses actions. Si on perd ça le joueur perd tout son progrès.

@@ -98,6 +98,13 @@ main {
 .hero {
   display: grid;
   gap: 1rem;
+  padding-top: 100px;
+}
+
+.hero-game {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
 }
 
 .eyebrow {
@@ -182,6 +189,10 @@ h1 {
 }
 
 .primary-btn {
+  align-self: center;
+  width: 33%;
+  aspect-ratio: 1 / 1;
+  border-radius: 100%;
   background: var(--primary);
   color: #fff;
 }
@@ -364,6 +375,36 @@ h1 {
 
 .upgrade-card.disabled .secondary-btn {
   cursor: not-allowed;
+}
+
+.settings-save-info {
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  padding: 1rem;
+  background: rgba(20, 99, 86, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.settings-save-info p {
+  margin: 0.5rem 0;
+}
+
+.settings-save-time {
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.settings-save-time-absolute {
+  display: block;
+  margin-top: 0.4rem;
+  font-size: 0.85rem;
+  opacity: 0.7;
+}
+
+.settings-save-empty {
+  opacity: 0.7;
+  font-style: italic;
 }
 
 @media (max-width: 768px) {

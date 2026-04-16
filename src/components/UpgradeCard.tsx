@@ -17,6 +17,15 @@ export function UpgradeCard({
   const hasIncomeBonus = upgrade.incomePerSecondGain > 0
   const hasClickBonus = upgrade.clickValueGain > 0
 
+  // Ratio coût / bonus
+  const incomeEfficiency = hasIncomeBonus
+    ? currentCost / upgrade.incomePerSecondGain
+    : null
+
+  const clickEfficiency = hasClickBonus
+    ? currentCost / upgrade.clickValueGain
+    : null
+
   return (
     <div className={`upgrade-card ${!canAfford ? 'disabled' : ''}`}>
       <h3>{upgrade.name}</h3>
@@ -29,9 +38,19 @@ export function UpgradeCard({
           Coût: <strong>${formatNumber(currentCost)}</strong>
         </p>
         {hasIncomeBonus && (
-          <p>+${formatNumber(upgrade.incomePerSecondGain)}/sec</p>
+          <p>
+            +${formatNumber(upgrade.incomePerSecondGain)}/sec
+            <br />
+            <small>({formatNumber(incomeEfficiency)}/sec)</small>
+          </p>
         )}
-        {hasClickBonus && <p>+${formatNumber(upgrade.clickValueGain)}/clic</p>}
+        {hasClickBonus && (
+          <p>
+            +${formatNumber(upgrade.clickValueGain)}/clic
+            <br />
+            <small>({formatNumber(clickEfficiency)}/clic)</small>
+          </p>
+        )}
         {!hasIncomeBonus && !hasClickBonus && <p>Aucun bonus</p>}
       </div>
       <button onClick={onBuy} disabled={!canAfford} className="secondary-btn">

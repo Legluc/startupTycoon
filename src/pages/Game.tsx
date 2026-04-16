@@ -9,7 +9,7 @@ export function HomePage() {
   }
 
   return (
-    <section className="hero">
+    <section className="hero hero-game">
       <div className="gameboard">
         <h1>Startup Tycoon</h1>
       </div>

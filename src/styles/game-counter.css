@@ -5,7 +5,9 @@
   --text-muted: #cbd5e1;
   --text-primary: #f8fafc;
   --income: #22c55e;
-
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
   width: min(920px, calc(100% - 2rem));
   margin: 1rem auto 1.5rem;
   padding: 1rem 1.25rem;
