@@ -1,3 +1,5 @@
+'use client'
+
 import { memo } from 'react'
 import { formatNumber } from '../utils/formatNumbers'
 
@@ -15,5 +17,5 @@ export const ClickButton = memo(
       </button>
     )
   },
-  (prev, next) => formatNumber(prev) === formatNumber(next)
+  (prev, next) => formatNumber(prev.clickValue) === formatNumber(next.clickValue)
 )

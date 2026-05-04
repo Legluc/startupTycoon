@@ -1,3 +1,5 @@
+'use client'
+
 import { memo, useCallback, useMemo } from 'react'
 import type { Upgrade } from '../types/upgrade'
 import { formatNumber } from '../utils/formatNumbers'

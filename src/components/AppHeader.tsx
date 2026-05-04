@@ -1,38 +1,39 @@
+'use client'
+
 import { memo } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 
 export const AppHeader = memo(function AppHeader() {
+  const pathname = usePathname()
+
   return (
     <header className="site-header">
-      <Link to="/" className="brand">
+      <Link href="/" className="brand">
         Startup Tycoon
       </Link>
       <nav className="main-nav" aria-label="Navigation principale">
-        <NavLink
-          to="/"
-          className={({ isActive }) => (isActive ? 'active' : undefined)}
-          end
-        >
+        <Link href="/" className={pathname === '/' ? 'active' : undefined}>
           Jeu
-        </NavLink>
-        <NavLink
-          to="/shop"
-          className={({ isActive }) => (isActive ? 'active' : undefined)}
+        </Link>
+        <Link
+          href="/shop"
+          className={pathname === '/shop' ? 'active' : undefined}
         >
           Boutique
-        </NavLink>
-        <NavLink
-          to="/stats"
-          className={({ isActive }) => (isActive ? 'active' : undefined)}
+        </Link>
+        <Link
+          href="/stats"
+          className={pathname === '/stats' ? 'active' : undefined}
         >
           Stats
-        </NavLink>
-        <NavLink
-          to="/settings"
-          className={({ isActive }) => (isActive ? 'active' : undefined)}
+        </Link>
+        <Link
+          href="/settings"
+          className={pathname === '/settings' ? 'active' : undefined}
         >
           Parametres
-        </NavLink>
+        </Link>
       </nav>
     </header>
   )

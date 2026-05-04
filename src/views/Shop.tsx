@@ -1,3 +1,5 @@
+'use client'
+
 import { useState, useCallback, useMemo } from 'react'
 import { UpgradeCard } from '../components/UpgradeCard'
 import { useGame } from '../lib/GameContext'

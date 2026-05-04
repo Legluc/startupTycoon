@@ -1,3 +1,5 @@
+'use client'
+
 import { memo, useMemo } from 'react'
 import { useGame } from '../lib/GameContext'
 import { formatNumber } from '../utils/formatNumbers'

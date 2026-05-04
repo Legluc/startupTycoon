@@ -98,7 +98,7 @@ main {
 .hero {
   display: grid;
   gap: 1rem;
-  padding-top: 100px;
+  padding-top: 100px !important;
 }
 
 .hero-game {

@@ -306,3 +306,27 @@ Le TICK est un bon révélateur de problèmes de perf car il est régulier et re
 
 La virtualisation des listes (windowing) pour les upgrades aurais pu etre faite mais au vue du petit nombre d'upgrade et du fait qu'elle ne soit pas re-render hormis dnas le cas ou elle devient achetable et ou elle est acheté ce n'est pas pertinent en rapport de gain / effort.
 L'utilisation de Web worker pour faire du multi-thread mais il n'y a pas de calcul complexe à réalisé ici donc peut d'intéret ici aussi.
+
+## Pourquoi le HTML est visible avant JS ?
+
+Avec SSG (ou SSR), le serveur génère le HTML complet avant de l'envoyer au navigateur. Le navigateur reçoit un document déjà rempli : il peut l'afficher immédiatement, avant même de télécharger le moindre fichier JavaScript.
+
+## Que fait l'hydration ?
+
+L'hydration est l'étape où React prend le contrôle du HTML déjà rendu par le serveur. React ne re-render pas from scratch : il réconcilie le DOM existant avec son Virtual DOM. Si le HTML du serveur correspond exactement au rendu React attendu alors 0 modification du DOM. Si ça diverge "hydration mismatch" (warning ou erreur). Sur /public-stats, comme il n'y a aucun 'use client', il n'y a pas d'hydration — la page reste du HTML statique pur.
+
+## Pourquoi SSR ≠ "pas de JS" ?
+
+SSR/SSG détermine quand le HTML est produit, pas si JS est nécessaire. Une page Next.js avec des composants 'use client' envoie du HTML et du JS. Le JS sert à hydrater la page pour la rendre interactive.
+
+## Qu’est-ce qui change pour le SEO ?
+
+Je n'ai aucun changement dans lighthouse, j'ai 100% dans les deux cas. En revanche je sais qu'avec le SSG le html et les métadonnées étant rendu immédiatement à la différence du CSR donc le SSG est plus performant et plus sure dans une optique SEO.
+
+## Qu’est-ce qui change pour FCP/LCP ?
+
+En SSG le FCP est limité par la latence réseau uniquement (Time To First Byte). En CSR il est limité par TTFB + download JS + parse + execute + render. Donc on peut conclure que le SSG est plus performant et plus sure pour un rendu rapide.
+
+## Quels sont les coûts côté serveur ?
+
+SSG est le meilleur des deux mondes pour des données qui changent peu : coût serveur nul (CDN), HTML visible immédiatement. La contrepartie est que pour mettre à jour les stats, il faut rebuilder. C'est pourquoi public-stats.json serait idéalement alimenté par un script au moment du déploiement ou basculé sur une route api pour le rendre dynamique.

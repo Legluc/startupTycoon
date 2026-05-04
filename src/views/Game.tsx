@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback } from 'react'
 import { ClickButton } from '../components/ClickButton'
 import { useGame } from '../lib/GameContext'

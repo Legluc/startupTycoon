@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, useContext, useEffect, useReducer } from 'react'
 import type { ReactNode } from 'react'
 import type { GameState, GameAction } from '../types/gameState'

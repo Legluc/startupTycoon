@@ -48,6 +48,7 @@ export function saveGameState(state: GameState): void {
       savedAt: Date.now(),
       state,
     }
+    if (typeof window === 'undefined') return
     localStorage.setItem(STORAGE_KEY, JSON.stringify(saveFile))
   } catch (error) {
     console.error('Failed to save game state:', error)
@@ -61,6 +62,7 @@ export function saveGameState(state: GameState): void {
  */
 export function loadGameState(): GameState | null {
   try {
+    if (typeof window === 'undefined') return null
     const stored = localStorage.getItem(STORAGE_KEY)
     if (!stored) return null
 
@@ -111,6 +113,7 @@ function restoreUpgrades(savedUpgrades: any[]): any[] {
  */
 export function getLastSaveTime(): Date | null {
   try {
+    if (typeof window === 'undefined') return null
     const stored = localStorage.getItem(STORAGE_KEY)
     if (!stored) return null
 
@@ -129,6 +132,7 @@ export function getLastSaveTime(): Date | null {
  */
 export function clearGameSave(): void {
   try {
+    if (typeof window === 'undefined') return
     localStorage.removeItem(STORAGE_KEY)
   } catch (error) {
     console.error('Failed to clear save:', error)

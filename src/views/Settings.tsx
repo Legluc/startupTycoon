@@ -1,3 +1,5 @@
+'use client'
+
 import { useCallback } from 'react'
 import { useGame } from '../lib/GameContext'
 import { clearGameSave } from '../services/storage'
