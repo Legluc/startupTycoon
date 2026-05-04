@@ -330,3 +330,99 @@ En SSG le FCP est limité par la latence réseau uniquement (Time To First Byte)
 ## Quels sont les coûts côté serveur ?
 
 SSG est le meilleur des deux mondes pour des données qui changent peu : coût serveur nul (CDN), HTML visible immédiatement. La contrepartie est que pour mettre à jour les stats, il faut rebuilder. C'est pourquoi public-stats.json serait idéalement alimenté par un script au moment du déploiement ou basculé sur une route api pour le rendre dynamique.
+
+## Les cookies Clerk
+
+ajs_user_id                                                 - .clerk.com - 2027-05-04T13:03:46.000Z - non HttpOnly - non Sécrusisé - Lax SameSite
+ajs_anonymous_id                                            - .clerk.com - 2027-05-04T13:03:46.000Z - non HttpOnly - non Sécrusisé - Lax SameSite
+_gcl_au                                                     - .clerk.com - 2026-08-02T12:46:11.000Z - non HttpOnly - non Sécrusisé - vide SameSite
+_ga_1WMF5X234K                                              - .clerk.com - 2027-06-08T12:46:12.840Z - non HttpOnly - non Sécrusisé - vide SameSite
+_ga                                                         - .clerk.com - 2027-06-08T12:46:10.958Z - non HttpOnly - non Sécrusisé - vide SameSite
+__client_uat                                                - .clerk.com - 2027-06-08T13:14:05.100Z - non HttpOnly - oui Sécrusisé - Lax SameSite
+__client_uat_DvIHvy3E                                       - .clerk.com - 2027-06-08T13:14:05.100Z - non HttpOnly - oui Sécrusisé - Lax SameSite
+ph_phc_q5TPT5kitT5x2OFKOo7yB3bLWm1ChE24asf8wJGM8cq_posthog  - .clerk.com - 2027-05-04T13:03:58.000Z - non HttpOnly - oui Sécrusisé - Lax SameSite
+__cf_bm                                                     - .clerk.com - 2026-05-04T13:33:16.335Z - oui HttpOnly - oui Sécrusisé - Lax SameSite
+
+## Quel est le rôle du cookie __session ?
+
+Le cookie __session est un cookie HttpOnly géré par Clerk qui stocke la session utilisateur après authentification.
+
+## Quels cookies voyez-vous ? Quels cookies ne voyez-vous pas ? Pourquoi ?
+
+Visibles dans document.cookie :
+
+__clerk_db_jwt (JWT pour le client)
+clerk_active_context (contexte actif)
+__client_uat (user access token côté client) 
+__next_hmr_refresh_hash__ (internal Next.js)
+
+Les cookies non visibles sont HttpOnly car ils sont intentionnellement invisibles au JavaScript. Le navigateur les envoie automatiquement dans les headers HTTP, mais aucun script JS ne peut les lire.
+
+## Décrivez les 3 parties : header, payload, signature.
+
+{
+  "alg": "RS256",
+  "cat": "cl_B7d4PD111AAA",
+  "kid": "ins_3DGC6RbgQaOglagDsLk6LCFM35J",
+  "typ": "JWT"
+}
+
+{
+  "azp": "http://localhost:3000",
+  "exp": 1777905667,
+  "fva": [
+    85,
+    -1
+  ],
+  "iat": 1777905607,
+  "iss": "https://balanced-chamois-79.clerk.accounts.dev",
+  "nbf": 1777905597,
+  "sid": "sess_3DGFRsC6DifD8ixBMuzDhZ854TQ",
+  "sts": "active",
+  "sub": "user_3DGDPJWoHeW2vdGyTqRFP1g7ysm",
+  "v": 2
+}
+
+{
+  "e": "AQAB",
+  "kty": "RSA",
+  "n": "s2wq94ln9t_k0e5BnLrRqpI2iu3YD6-3vEVWztQ312iHO4OakrkmcIVlDmi6IML04XXPTwy_mVblMAHqH1e4z1MPkz_sHqh30_OML2zmxHMApWjUnwRid1_irKShBabql2RLDX1RxBJYlLtXytYXe-XtTqA8PFmFUdggvM0s_xb1dsH5biPky5OsC61Rf9Ck4G32PqHvk8D7I42ypyNubnczInY5pD6060fc7WgOvZVi2a0Hj7l5M7Ad8Knr8BRhZPclDnYuq5pGTgzJSjg8yvlWMCrdSSc8YFEzL7rGnBZ663KTeKgiCnzFh60CF5ZDn1vD1IftAwzSbu0_SsDUOw"
+}
+
+## Quel algorithme de signature est utilisé ? 
+
+c'est l'algorithme RS256 qui est utilisé
+
+## Quelles informations sont dans le payload ?
+
+Le payload contient les informations de session et d'identité :
+
+sub : identifiant unique de l'utilisateur (user_3DGDPJWoHeW2vdGyTqRFP1g7ysm)
+sid : identifiant de session (sess_3DGFRsC6DifD8ixBMuzDhZ854TQ)
+iss : autorité émettrice (Clerk)
+iat : timestamp d'émission (1777905607)
+exp : timestamp d'expiration (1777905667)
+nbf : not before - le token n'est valide qu'après ce timestamp
+azp : authorized party - l'application autorisée (http://localhost:3000)
+sts : statut de la session (active)
+fva : facteurs de vérification d'authentification
+
+## Peut-on modifier le payload côté client pour se faire passer pour un autre user ?
+
+Non, c'est impossible la signature RS256 sera invalide. En modifiant le payload le serveur reçevrait le token modifié la signature ne correspondrais pas et le token serait rejeté.
+RS256 utilise une clé privée (côté Clerk) pour signer et une clé publique (partagée) pour vérifier. Impossible de re-signer sans la clé privée.
+
+## Quelle est la durée de vie du token ?
+
+exp (expiration) : 1777905667
+iat (issued at) : 1777905607
+Durée = 60 secondes
+
+## Quand votre application appelle un endpoint de votre API backend, quel header est ajouté pour l'authentification ?
+
+On ajoute le header Authorization: Bearer token est ajouté.
+
+
+## Où le token est-il stocké en mémoire côté client ?
+
+Le token n'est pas stocké en mémoire côté client mais dans le cookie __session ou dans la ram temporaire quand on appel getToken() le temps de l'execution de la fonction.

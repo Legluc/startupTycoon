@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import { ClerkProvider } from '@clerk/nextjs'
 import '@/index.css'
 
 export const metadata: Metadata = {
@@ -12,8 +13,13 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr">
-      <body>{children}</body>
-    </html>
+    <ClerkProvider
+      signInUrl="/sign-in"
+      signUpUrl="/sign-up"
+    >
+      <html lang="fr">
+        <body>{children}</body>
+      </html>
+    </ClerkProvider>
   )
 }

@@ -2,6 +2,7 @@
 
 import { useCallback } from 'react'
 import { ClickButton } from '../components/ClickButton'
+import { MultiplayerButton } from '../components/MultiplayerButton'
 import { useGame } from '../lib/GameContext'
 
 export function HomePage() {
@@ -18,6 +19,7 @@ export function HomePage() {
         <h1>Startup Tycoon</h1>
       </div>
       <ClickButton clickValue={state.clickValue} onClick={handleClick} />
+      <MultiplayerButton />
     </section>
   )
 }
