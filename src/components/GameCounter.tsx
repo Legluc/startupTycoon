@@ -21,12 +21,17 @@ export const GameCounter = memo(function GameCounter() {
     <section className="game-counter" aria-label="Compteur de progression">
       <div className="game-counter__item">
         <span className="game-counter__label">Argent</span>
-        <span className="game-counter__value">${displayValues.money}</span>
+        <span className="game-counter__value" suppressHydrationWarning>
+          ${displayValues.money}
+        </span>
       </div>
       <div className="game-counter__divider" aria-hidden="true"></div>
       <div className="game-counter__item">
         <span className="game-counter__label">Revenu/sec</span>
-        <span className="game-counter__value game-counter__value--income">
+        <span
+          className="game-counter__value game-counter__value--income"
+          suppressHydrationWarning
+        >
           +${displayValues.income}/s
         </span>
       </div>

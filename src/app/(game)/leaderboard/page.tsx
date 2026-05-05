@@ -1,56 +1,74 @@
-// Page publique — accessible sans compte
-// Server Component (pas de 'use client')
+'use client'
 
-import type { Metadata } from 'next'
+// Page leaderboard — publique, données temps réel via useLeaderboard()
 
-export const metadata: Metadata = {
-  title: 'Startup Tycoon — Leaderboard',
-}
-
-// Données mock — à remplacer par une vraie source (DB, API)
-const mockLeaderboard = [
-  { rank: 1, name: 'Alice', totalEarned: 9_870_000 },
-  { rank: 2, name: 'Bob', totalEarned: 5_430_000 },
-  { rank: 3, name: 'Charlie', totalEarned: 3_210_000 },
-  { rank: 4, name: 'Diana', totalEarned: 1_980_000 },
-  { rank: 5, name: 'Evan', totalEarned: 870_000 },
-]
-
-function formatNumber(n: number): string {
-  if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(2)}M`
-  if (n >= 1_000) return `${(n / 1_000).toFixed(1)}k`
-  return n.toString()
-}
+import { useLeaderboard } from '@/hooks/useLeaderboard'
+import { formatNumber } from '@/utils/formatNumbers'
 
 export default function LeaderboardPage() {
+  const { data, isLoading, isError, error } = useLeaderboard(20)
+
   return (
     <main style={{ padding: '2rem', maxWidth: '600px', margin: '0 auto' }}>
       <h1>Leaderboard</h1>
       <p style={{ color: '#888', marginBottom: '1.5rem' }}>
-        Classement public — visible sans compte.
+        Classement public — top 20 all-time (mis à jour toutes les 10 s).
       </p>
-      <table style={{ width: '100%', borderCollapse: 'collapse' }}>
-        <thead>
-          <tr>
-            <th style={thStyle}>#</th>
-            <th style={{ ...thStyle, textAlign: 'left' }}>Joueur</th>
-            <th style={{ ...thStyle, textAlign: 'right' }}>Total gagné</th>
-          </tr>
-        </thead>
-        <tbody>
-          {mockLeaderboard.map((entry) => (
-            <tr key={entry.rank} style={entry.rank === 1 ? goldRowStyle : {}}>
-              <td style={tdStyle}>{entry.rank}</td>
-              <td style={{ ...tdStyle, textAlign: 'left' }}>{entry.name}</td>
-              <td style={{ ...tdStyle, textAlign: 'right' }}>
-                ${formatNumber(entry.totalEarned)}
-              </td>
+
+      {isLoading && <p>Chargement…</p>}
+
+      {isError && (
+        <p style={{ color: '#e55' }}>Erreur : {(error as Error).message}</p>
+      )}
+
+      {data && (
+        <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+          <thead>
+            <tr>
+              <th style={thStyle}>#</th>
+              <th style={{ ...thStyle, textAlign: 'left' }}>Joueur</th>
+              <th style={{ ...thStyle, textAlign: 'right' }}>Score</th>
+              <th style={{ ...thStyle, textAlign: 'right' }}>Durée</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {data.entries.map((entry, index) => (
+              <tr key={entry.userId} style={index === 0 ? goldRowStyle : {}}>
+                <td style={tdStyle}>{index + 1}</td>
+                <td style={{ ...tdStyle, textAlign: 'left' }}>
+                  {entry.displayName || entry.userId.slice(0, 8)}
+                  {/* Score optimiste en attente de confirmation */}
+                  {entry.userId === 'optimistic' && (
+                    <span
+                      style={{
+                        color: '#888',
+                        fontSize: '0.75rem',
+                        marginLeft: '0.5rem',
+                      }}
+                    >
+                      (en cours…)
+                    </span>
+                  )}
+                </td>
+                <td style={{ ...tdStyle, textAlign: 'right' }}>
+                  ${formatNumber(entry.score)}
+                </td>
+                <td style={{ ...tdStyle, textAlign: 'right' }}>
+                  {formatDuration(entry.duration)}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </main>
   )
+}
+
+function formatDuration(seconds: number): string {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return `${m}m${String(s).padStart(2, '0')}s`
 }
 
 const thStyle: React.CSSProperties = {

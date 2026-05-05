@@ -2,10 +2,16 @@
 
 import { useMemo } from 'react'
 import { useGame } from '../lib/GameContext'
+import { useMyGames } from '../hooks/useMyGames'
 import { formatNumber } from '../utils/formatNumbers'
 
 export function Stats() {
   const { state } = useGame()
+  const {
+    data: myGames,
+    isLoading: gamesLoading,
+    isError: gamesError,
+  } = useMyGames()
 
   const stats = useMemo(() => {
     const totalUpgradesBought = state.upgrades.reduce(
@@ -158,7 +164,6 @@ export function Stats() {
           </div>
         )}
       </div>
-
       {/* Section des upgrades détaillés */}
       <div className="stats-upgrades">
         <h2>Détail des upgrades</h2>
@@ -179,6 +184,121 @@ export function Stats() {
           <p style={{ opacity: 0.6 }}>Aucun upgrade acheté pour le moment</p>
         )}
       </div>
+
+      {/* Historique des parties enregistrées */}
+      <div className="stats-history">
+        <h2>Historique de mes parties</h2>
+        {gamesLoading && <p>Chargement…</p>}
+        {gamesError && (
+          <p style={{ color: '#e55' }}>Impossible de charger l'historique.</p>
+        )}
+        {myGames && myGames.games.length === 0 && (
+          <p style={{ opacity: 0.6 }}>
+            Aucune partie enregistrée pour le moment.
+          </p>
+        )}
+        {myGames && myGames.games.length > 0 && (
+          <>
+            {/* Graphique simplifié : barres proportionnelles au meilleur score */}
+            <div className="history-chart" style={{ marginBottom: '1rem' }}>
+              {(() => {
+                const best = Math.max(...myGames.games.map((g) => g.score), 1)
+                return myGames.games.slice(0, 10).map((game, i) => (
+                  <div
+                    key={game.id}
+                    title={`Partie #${i + 1} — $${formatNumber(game.score)}`}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem',
+                      marginBottom: '0.4rem',
+                      fontSize: '0.8rem',
+                    }}
+                  >
+                    <span
+                      style={{
+                        width: '3rem',
+                        textAlign: 'right',
+                        opacity: 0.6,
+                      }}
+                    >
+                      #{i + 1}
+                    </span>
+                    <div
+                      style={{
+                        height: '14px',
+                        width: `${Math.max(4, (game.score / best) * 200)}px`,
+                        background:
+                          game.id === -1
+                            ? '#888'
+                            : 'var(--color-primary, #6c63ff)',
+                        borderRadius: '2px',
+                        transition: 'width 0.3s ease',
+                      }}
+                    />
+                    <span>${formatNumber(game.score)}</span>
+                    {game.id === -1 && (
+                      <span style={{ opacity: 0.5 }}>(en cours…)</span>
+                    )}
+                  </div>
+                ))
+              })()}
+            </div>
+
+            {/* Tableau des 10 dernières parties */}
+            <table
+              style={{
+                width: '100%',
+                borderCollapse: 'collapse',
+                fontSize: '0.875rem',
+              }}
+            >
+              <thead>
+                <tr>
+                  <th style={histThStyle}>Date</th>
+                  <th style={histThStyle}>Score</th>
+                  <th style={histThStyle}>Clics</th>
+                  <th style={histThStyle}>Durée</th>
+                </tr>
+              </thead>
+              <tbody>
+                {myGames.games.slice(0, 10).map((game) => (
+                  <tr key={game.id}>
+                    <td style={histTdStyle}>
+                      {game.id === -1
+                        ? '—'
+                        : new Date(game.createdAt).toLocaleDateString('fr-FR')}
+                    </td>
+                    <td style={histTdStyle}>${formatNumber(game.score)}</td>
+                    <td style={histTdStyle}>{formatNumber(game.clicks)}</td>
+                    <td style={histTdStyle}>{formatDuration(game.duration)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </>
+        )}
+      </div>
     </section>
   )
+}
+
+function formatDuration(seconds: number): string {
+  const m = Math.floor(seconds / 60)
+  const s = seconds % 60
+  return `${m}m${String(s).padStart(2, '0')}s`
+}
+
+const histThStyle: React.CSSProperties = {
+  padding: '0.5rem 0.75rem',
+  borderBottom: '2px solid #333',
+  color: '#888',
+  fontSize: '0.8rem',
+  textAlign: 'left',
+}
+
+const histTdStyle: React.CSSProperties = {
+  padding: '0.5rem 0.75rem',
+  borderBottom: '1px solid #222',
+  textAlign: 'left',
 }
